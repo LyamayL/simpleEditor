@@ -1,5 +1,5 @@
 # simpleEditor
-###🇫🇷 — Éditeur de Mosaïque (Processing) — Projet d’Introduction à l’Informatique Graphique (L1, Université Paris-Saclay)
+### 🇫🇷 — Éditeur de Mosaïque (Processing) — Projet d’Introduction à l’Informatique Graphique (L1, Université Paris-Saclay)
 
 Dans le cadre de mon cours d’introduction à l’informatique graphique (INFO112) en L1 à l’Université Paris-Saclay, j’ai développé un éditeur graphique en 2D inspiré des outils de création de mosaïques et de vitraux. À partir d’un éditeur minimaliste fourni par l’enseignant, j’ai fait évoluer le logiciel pour en faire un véritable outil de création visuelle interactif, permettant de transformer une image en mosaïque colorée.
 
