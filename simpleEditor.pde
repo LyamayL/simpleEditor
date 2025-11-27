@@ -203,7 +203,34 @@ void mousePressed(){
         t.p3 = new PVector(mouseX, mouseY);
         t.ptToDraw = 0;
       }
+    
+    } 
+    
+    // On commence un polygone
+    else if(currentShape == POLYGON && selectedShape==null && currentColor != pipette){
+    
+      Polygon p = new Polygon();
+      p.col = currentColor;
+      p.p1 = new PVector(mouseX, mouseY);
+      p.points.add(p.p1);
+      selectedShape = p;
+
     }
+    
+    // Si un polygone est déjà en cours de création
+    else if(currentShape == POLYGON && selectedShape!=null){
+      Polygon p = (Polygon)selectedShape;
+      if(dist(mouseX, mouseY, p.points.get(0).x, p.points.get(0).y) <= 10){
+        // Si on est proche de notre point de départ alors on ferme la forme
+        p.points.add(new PVector(p.points.get(0).x, p.points.get(0).y));
+        p.isEditing = false;
+      }
+      else
+        p.points.add(new PVector(mouseX, mouseY));
+      
+      
+    
+    } 
     
     // On vérifie si currentColor == 256, si oui on est en mode pipette.
     else if(currentColor == pipette){
@@ -230,6 +257,11 @@ void mouseReleased(){
     selectedShape = null;
   }
   if(currentShape == TRIANGLE && selectedShape!=null && ((Triangle)selectedShape).ptToDraw==0){
+    objs.add(selectedShape);
+    selectedShape = null;
+  }
+  
+  if(currentShape == POLYGON && selectedShape!=null && !((Polygon)selectedShape).isEditing){
     objs.add(selectedShape);
     selectedShape = null;
   }
