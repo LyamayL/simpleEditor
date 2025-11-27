@@ -1,5 +1,5 @@
 # simpleEditor
-----
+
 ### 🇫🇷 — Éditeur de Mosaïque (Processing) 
 #### Projet d’Introduction à l’Informatique Graphique (L1, Université Paris-Saclay)
 
