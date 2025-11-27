@@ -23,7 +23,7 @@ Activation/désactivation de l’image de fond, visualisation des points de cont
 
 As part of my first-year Introduction to Computer Graphics course (INFO112) at Université Paris-Saclay, I developed a 2D graphical editor inspired by mosaic and stained-glass creation tools. Starting from a minimal editor provided by the instructor, I expanded it into a fully-featured interactive visual creation environment designed to turn any image into a colorful mosaic.
 
-Key Features I Implemented
+Key Features I Implemented :
 
 - Dynamic color palette:
 Upgraded from a fixed set of three colors to an extensible list, dynamic display, color selection, color sampling through an integrated pipette tool, and editing options (brightness, saturation…).
