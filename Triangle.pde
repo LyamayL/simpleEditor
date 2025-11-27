@@ -1,7 +1,7 @@
-class Triangle  extends Shape{
+class Triangle extends Shape{
   PVector p2;
   PVector p3;
-  int ptToDraw =3;
+  int ptToDraw = 3;
   
   void draw(){
     if (p1!=null && p2!=null && p3!=null){
