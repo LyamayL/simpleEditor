@@ -11,7 +11,7 @@ Fonctionnalités principales développées :
 Passage d’un système fixe à une liste extensible de couleurs, affichage adaptatif, sélection dynamique, ajout de couleurs via une pipette intégrée, et possibilités d’édition (luminosité, saturation…).
 
 - Nouvelles formes et polygones personnalisés :
-Création d’un système de polygones à nombre de points variable, détection automatique de fermeture du polygone, et ajout de formes préétablies (croix, rosace, hexagone, losange…).
+Création d’un système de polygones à nombre de points variable, détection automatique de fermeture du polygone.
 
 - Modes d’affichage avancés :
 Activation/désactivation de l’image de fond, visualisation des points de contrôle, mode "vitrail/mosaïque", bordures configurables, aimants pour aligner les points, et outils d’édition avancée (déplacement, recoloration…).
@@ -29,7 +29,7 @@ Key Features I Implemented :
 Upgraded from a fixed set of three colors to an extensible list, dynamic display, color selection, color sampling through an integrated pipette tool, and editing options (brightness, saturation…).
 
 - New shapes and customizable polygons:
-Support for polygons with any number of points, automatic polygon completion through distance detection, and prebuilt shapes (cross, rosette, hexagon, diamond…).
+Support for polygons with any number of points, automatic polygon completion through distance detection.
 
 - Advanced rendering modes:
 Optional background image display, point markers, “mosaic/stained-glass” mode, customizable borders, magnetic snapping for precise alignment, and advanced editing tools (recoloring, moving shapes…).
