@@ -6,7 +6,9 @@ color color3 = color(0, 0, 255);
 color color4 = color(255, 255, 0);
 color color5 = color(255, 0, 255);
 color color6 = color(0, 255, 255);
-int pipette = 256;
+int pipette = 256; // On met a 256 car color est entre 0 et 255
+
+PImage img;
 
 // Création de la liste de couleurs
 ArrayList<Integer> colors = new ArrayList<Integer>();
@@ -20,6 +22,11 @@ int POLYGON = 2;
 int currentShape = TRIANGLE;
 Shape selectedShape = null;
 
+// Création des paramètres toggle-ables
+boolean showBg = true; // Enlevable avec f
+boolean showBorder = true; // Enlevable avec b
+boolean isMosaique = true; // Si pas mosaique alors vitrail (bords très épais), modifiable avec m
+
 void setup(){ 
   // Ajout des couleurs pré-définies à la liste
   colors.add(color1);
@@ -28,7 +35,31 @@ void setup(){
   colors.add(color4);
   colors.add(color5); 
   colors.add(color6);
+  
+  // On charge une image chosie par l'user
+  selectInput("Select a file to process:", "initImg");
+
   size(1400, 1200);
+}
+
+int getCurrentStrokeWeight(){
+
+   if(showBorder){
+  
+    if(isMosaique)
+      return 3;
+    else
+      return 10;
+  }else
+    return 0;
+}
+
+void initImg(File selection) {
+  if (selection == null) {
+    println("Aucun fichier choisit...");
+  } else {
+    img = loadImage(selection.getAbsolutePath());
+  }
 }
 
 void draw(){
@@ -37,6 +68,14 @@ void draw(){
   strokeWeight(1);
   stroke(0);
   rect(32+2*8, 0, width-2*32-4*8, height);
+  
+  // On dessine notre image au fond
+  if(img != null && showBg){
+    img.resize(800, 800);
+    image(img, width/2- img.width/2, height/2 - img.height/2);
+  }
+  
+  strokeWeight(getCurrentStrokeWeight());
   
   // on dessine (au fond=derriere) tous les objets
   for (Shape obj: objs){
@@ -195,3 +234,52 @@ void mouseReleased(){
     selectedShape = null;
   }
 }
+
+void keyPressed(){
+  if(key == 32){ // Code 32 = touche espace
+      // Si espace est préssé, on enregistre le rendu dans une image.
+      int debutZone = 32+2*8;
+      int widthZone = width - (2*32+4*8);
+      PImage output = createImage(widthZone, height, ARGB); // width - ... car notre zone de dessin se situe entre 32+2*8 et width-...
+      
+      // Chargement des pixels de la fenêtre & de l'image
+      loadPixels();
+      output.loadPixels();
+      
+      int idx = 0;
+      for(int j=0; j<height; j++){
+         // On se place dans notre zone de dessin
+         for(int i=debutZone; i<debutZone+widthZone; i++){
+            // Obligé d'utiliser un autre index
+            output.pixels[idx] = pixels[i+j*width];
+            idx += 1;
+         }
+      
+      }
+      
+      output.updatePixels();
+      output.save("save.png");
+      println("Enregistré !");
+  }
+  
+  else if(key == 98){ // Si b alors on affiche les bordures
+    
+    showBorder = !showBorder;
+    print("Bordures modifiées !");
+  
+  }
+  
+  else if(key == 102){
+    
+    showBg = !showBg;
+    println("Fond modifié !");
+  
+  }
+  else if(key == 109){
+    
+    isMosaique = !isMosaique;
+    println("Style modifié !");
+  
+  }
+  
+} 
