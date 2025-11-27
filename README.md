@@ -15,8 +15,10 @@ Création d’un système de polygones à nombre de points variable, détection 
 - Modes d’affichage avancés :
 Activation/désactivation de l’image de fond, visualisation des points de contrôle, mode "vitrail/mosaïque", bordures configurables, aimants pour aligner les points, et outils d’édition avancée (déplacement, recoloration…).
 
+------
+
 ## 🇬🇧 — Mosaic Editor (Processing) 
-## Introduction to Computer Graphics Project (1st Year, Paris-Saclay University)
+### Introduction to Computer Graphics Project (1st Year, Paris-Saclay University)
 
 As part of my first-year Introduction to Computer Graphics course (INFO112) at Université Paris-Saclay, I developed a 2D graphical editor inspired by mosaic and stained-glass creation tools. Starting from a minimal editor provided by the instructor, I expanded it into a fully-featured interactive visual creation environment designed to turn any image into a colorful mosaic.
 
