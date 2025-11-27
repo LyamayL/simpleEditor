@@ -16,7 +16,7 @@ Création d’un système de polygones à nombre de points variable, détection 
 - Modes d’affichage avancés :
 Activation/désactivation de l’image de fond, visualisation des points de contrôle, mode "vitrail/mosaïque", bordures configurables, aimants pour aligner les points, et outils d’édition avancée (déplacement, recoloration…).
 
-- - -
+***
 
 ### 🇬🇧 — Mosaic Editor (Processing) 
 #### Introduction to Computer Graphics Project (1st Year, Paris-Saclay University)
