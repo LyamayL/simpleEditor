@@ -4,4 +4,8 @@ class Shape{
   
   void draw(){
   }
+  
+  boolean isPointIn(PVector pt){
+    return false;
+  }
 }

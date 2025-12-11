@@ -28,4 +28,16 @@ class Polygon extends Shape{
   
   }
   
+  // inspiré de Jonas Raoni Soares Silva
+  // http://jsfromhell.com/math/is-point-in-poly [rev. #0]
+  boolean isPointIn(PVector pt){
+    boolean c = false;
+    for(int i = -1, l = points.size(), j = l - 1; ++i < l; j = i)
+      if (((points.get(i).y <= pt.y && pt.y < points.get(j).y) || (points.get(j).y <= pt.y && pt.y < points.get(i).y))
+           && (pt.x < (points.get(j).x - points.get(i).x) * (pt.y - points.get(i).y) / (points.get(j).y - points.get(i).y) + points.get(i).x))
+        c = !c;
+    return c;
+  }
+
+  
 }

@@ -26,6 +26,9 @@ Shape selectedShape = null;
 boolean showBg = true; // Enlevable avec f
 boolean showBorder = true; // Enlevable avec b
 boolean isMosaique = true; // Si pas mosaique alors vitrail (bords très épais), modifiable avec m
+boolean edition = false;
+
+Shape currentSelected = null;
 
 void setup(){ 
   // Ajout des couleurs pré-définies à la liste
@@ -37,13 +40,13 @@ void setup(){
   colors.add(color6);
   
   // On charge une image chosie par l'user
-  selectInput("Select a file to process:", "initImg");
+  selectInput("Choisissez un fichier à afficher en fond:", "initImg");
 
   size(1400, 1200);
 }
 
+// Retourne la strokeWeight en fonction du mode
 int getCurrentStrokeWeight(){
-
    if(showBorder){
   
     if(isMosaique)
@@ -75,10 +78,16 @@ void draw(){
     image(img, width/2- img.width/2, height/2 - img.height/2);
   }
   
-  strokeWeight(getCurrentStrokeWeight());
+  strokeWeight(3);
   
   // on dessine (au fond=derriere) tous les objets
   for (Shape obj: objs){
+    if(edition){
+       strokeWeight(0);
+       if(currentSelected == obj)
+         strokeWeight(getCurrentStrokeWeight());
+    }
+      
     obj.draw();
   }
   
@@ -97,7 +106,7 @@ void draw(){
   }
 
   // Dessin du bouton ajouter
-  if (currentColor == pipette) strokeWeight(4); else strokeWeight(1);
+  if (currentColor == pipette && !edition) strokeWeight(4); else strokeWeight(1);
   stroke(0);
   fill(color(200, 200, 200));
   rect (8, 8*(colors.size()+1)+32*colors.size(), 32, 32);
@@ -106,9 +115,8 @@ void draw(){
   strokeWeight(1);
   rect((8+32+(5/2))/2, 8*(colors.size()+1)+32*colors.size() + (12/2), 5, 32-12); // +(5/2) au début pour bien tout centrer puis +12/2 pour écarter des bords
   rect((32+8)/2-(12/2), (8*(colors.size()+1)+32*colors.size() + (8*(colors.size()+1)+32*colors.size() + 32))/2 - (5/2), 32-12, 5); // Pour le y, on fait la moyenne entre le y et le y+32 et on divise par 2. On retire 5/2 pour bien centrer. 
-
-    
-  if (currentShape == TRIANGLE) strokeWeight(4); else strokeWeight(1);
+  
+  if (currentShape == TRIANGLE && !edition) strokeWeight(4); else strokeWeight(1);
   fill(196);
   rect (width-8-32, 8, 32, 32);
   strokeWeight(2);
@@ -117,7 +125,7 @@ void draw(){
            width-8-32+26, 8+12,
            width-8-32+12, 8+27);
            
-  if (currentShape == RECT) strokeWeight(4); else strokeWeight(1);
+  if (currentShape == RECT && !edition) strokeWeight(4); else strokeWeight(1);
   fill(196);
   rect (width-8-32, 8*2+32*1, 32, 32);
   strokeWeight(2);
@@ -125,7 +133,7 @@ void draw(){
   rect(width-8-32+5, 8*2+32*1+7, 22, 16);
   
   // Dessin de la case polygone
-  if (currentShape == POLYGON) strokeWeight(4); else strokeWeight(1);
+  if (currentShape == POLYGON && !edition) strokeWeight(4); else strokeWeight(1);
   fill(196);
   rect (width-8-32, 8*3+32*2, 32, 32);
   strokeWeight(2);
@@ -145,13 +153,20 @@ void mouseClicked(){
   
   // Lors d'un click, on vérifie pour chaque élément de la liste colors si 8 < mouseX < 32+8 && 8*(i+1)+32*i < mouseY < 8*(i+1)+32*(i+1)
   for(int i=0; i<colors.size(); i++){
+    // On veut que le mode edition mette en currentColor la couleur du polygone
     if(mouseX>8 && mouseX<8+32 && mouseY>8*(i+1)+32*i && mouseY<8*(i+1)+32*(i+1)){
+      
       currentColor = colors.get(i);
+      // Si on est en mode édition et que la currentSelected n'est pas null alors on modifie la couleur
+      if(edition && currentSelected != null){
+        currentSelected.col = currentColor;
+      
+      }
     }
   }
   
   // Vérifier si on est sur le btn add
-  if(mouseX>8 && mouseX<8+32 && mouseY>8*(colors.size()+1)+32*colors.size() && mouseY<8*(colors.size()+1)+32*(colors.size()+1))
+  if(mouseX>8 && mouseX<8+32 && mouseY>8*(colors.size()+1)+32*colors.size() && mouseY<8*(colors.size()+1)+32*(colors.size()+1) && !edition)
     currentColor = pipette;
   
   
@@ -174,72 +189,89 @@ void mouseClicked(){
 void mousePressed(){
   // on est dans la zone de dessin
   if(mouseX>8+32 && mouseX<width-8-32) {
-
-    // si on commence un dessin de rectangle
-    // On vérifie si currentColor != pipette puisque sinon, on est en mode "pipette"
-    if(currentShape == RECT && selectedShape==null && currentColor != pipette){
-      Rectangle r  = new Rectangle(); //on cree l'objet 
-      r.col = currentColor; // on met a jour sa couleur
-      r.p1 = new PVector(mouseX, mouseY);// on met a jour son premier point
-      r.dims = new PVector(0, 0); // on met des dimensions nulles par defaut
-      selectedShape = r; // on dit que ce nouvel objet est le nouvel objet selectionne
+    // On vérifie que l'on est pas en mode édition
+    if(!edition){
     
-    // si on commence un nouveau triangle
-    } else if(currentShape == TRIANGLE && selectedShape==null && currentColor != pipette){
-      Triangle t  = new Triangle();
-      t.col = currentColor;
-      t.p1 = new PVector(mouseX, mouseY);
-      t.ptToDraw = 2; // on met a jour son compte a rebour de points
-      selectedShape = t;
+      // si on commence un dessin de rectangle
+      // On vérifie si currentColor != pipette puisque sinon, on est en mode "pipette"
+      if(currentShape == RECT && selectedShape==null && currentColor != pipette){
+        Rectangle r  = new Rectangle(); //on cree l'objet 
+        r.col = currentColor; // on met a jour sa couleur
+        r.p1 = new PVector(mouseX, mouseY);// on met a jour son premier point
+        r.dims = new PVector(0, 0); // on met des dimensions nulles par defaut
+        selectedShape = r; // on dit que ce nouvel objet est le nouvel objet selectionne
+      
+      // si on commence un nouveau triangle
+      } else if(currentShape == TRIANGLE && selectedShape==null && currentColor != pipette){
+        Triangle t  = new Triangle();
+        t.col = currentColor;
+        t.p1 = new PVector(mouseX, mouseY);
+        t.ptToDraw = 2; // on met a jour son compte a rebour de points
+        selectedShape = t;
+      
+      // si on a deja un triangle en cours de creation 
+      // Pas besoin de vérification sur le 256 car on le fait déjà lors de la création du triangle.
+      } else if(currentShape == TRIANGLE && selectedShape!=null){
+        Triangle t = (Triangle)selectedShape;
+        if(t.ptToDraw==2){ // selon ou on en est du noombre de points qui restent a donner
+          t.p2 = new PVector(mouseX, mouseY);
+          t.ptToDraw = 1;
+        } else if(t.ptToDraw==1){
+          t.p3 = new PVector(mouseX, mouseY);
+          t.ptToDraw = 0;
+        }
+      
+      } 
+      
+      // On commence un polygone
+      else if(currentShape == POLYGON && selectedShape==null && currentColor != pipette){
+      
+        Polygon p = new Polygon();
+        p.col = currentColor;
+        p.p1 = new PVector(mouseX, mouseY);
+        p.points.add(p.p1);
+        selectedShape = p;
+  
+      }
+      
+      // Si un polygone est déjà en cours de création
+      else if(currentShape == POLYGON && selectedShape!=null){
+        Polygon p = (Polygon)selectedShape;
+        if(dist(mouseX, mouseY, p.points.get(0).x, p.points.get(0).y) <= 10){
+          // Si on est proche de notre point de départ alors on ferme la forme
+          p.points.add(new PVector(p.points.get(0).x, p.points.get(0).y));
+          p.isEditing = false;
+        }
+        else
+          p.points.add(new PVector(mouseX, mouseY));
+      } 
+      
+      // On vérifie si currentColor == 256, si oui on est en mode pipette.
+      else if(currentColor == pipette){
+        color currentPixelColor = get(mouseX, mouseY);
+        colors.add(currentPixelColor);
+      } 
     
-    // si on a deja un triangle en cours de creation 
-    // Pas besoin de vérification sur le 256 car on le fait déjà lors de la création du triangle.
-    } else if(currentShape == TRIANGLE && selectedShape!=null){
-      Triangle t = (Triangle)selectedShape;
-      if(t.ptToDraw==2){ // selon ou on en est du noombre de points qui restent a donner
-        t.p2 = new PVector(mouseX, mouseY);
-        t.ptToDraw = 1;
-      } else if(t.ptToDraw==1){
-        t.p3 = new PVector(mouseX, mouseY);
-        t.ptToDraw = 0;
+    }else{
+    
+      for(Shape obj: objs){
+        
+        if(obj.isPointIn(new PVector(mouseX, mouseY))){
+          
+          currentSelected = obj;
+          println(currentSelected);
+          currentColor = obj.col;
+        
+        }
+        
       }
     
-    } 
-    
-    // On commence un polygone
-    else if(currentShape == POLYGON && selectedShape==null && currentColor != pipette){
-    
-      Polygon p = new Polygon();
-      p.col = currentColor;
-      p.p1 = new PVector(mouseX, mouseY);
-      p.points.add(p.p1);
-      selectedShape = p;
-
     }
     
-    // Si un polygone est déjà en cours de création
-    else if(currentShape == POLYGON && selectedShape!=null){
-      Polygon p = (Polygon)selectedShape;
-      if(dist(mouseX, mouseY, p.points.get(0).x, p.points.get(0).y) <= 10){
-        // Si on est proche de notre point de départ alors on ferme la forme
-        p.points.add(new PVector(p.points.get(0).x, p.points.get(0).y));
-        p.isEditing = false;
-      }
-      else
-        p.points.add(new PVector(mouseX, mouseY));
-      
-      
-    
-    } 
-    
-    // On vérifie si currentColor == 256, si oui on est en mode pipette.
-    else if(currentColor == pipette){
-      color currentPixelColor = get(mouseX, mouseY);
-      colors.add(currentPixelColor);
-    }
     
   }
 }
+
 
 void mouseDragged(){
   // uniquement pour les rectangles on met a jour les dimensions
@@ -298,6 +330,22 @@ void keyPressed(){
     
     showBorder = !showBorder;
     print("Bordures modifiées !");
+  
+  }
+  
+  else if(key == 101){
+  
+    if(edition){
+      edition = false;
+      currentSelected = null;
+      cursor(ARROW);
+      println("Mode édition desactivé !");
+    }else{
+      edition = true;
+      currentColor = 257;
+      cursor(HAND);
+      println("Mode édition activé !");
+    }
   
   }
   
