@@ -208,6 +208,12 @@ void mousePressed(){
         t.p1 = new PVector(mouseX, mouseY);
         t.ptToDraw = 2; // on met a jour son compte a rebour de points
         selectedShape = t;
+        /*Polygon triangle = new Polygon();
+        triangle.isTriangle = true;
+        triangle.col = currentColor;
+        triangle.p1 = new PVector(mouseX, mouseY);
+        triangle.points.add(triangle.p1);
+        selectedShape = triangle;*/
       
       // si on a deja un triangle en cours de creation 
       // Pas besoin de vérification sur le 256 car on le fait déjà lors de la création du triangle.
@@ -219,6 +225,7 @@ void mousePressed(){
         } else if(t.ptToDraw==1){
           t.p3 = new PVector(mouseX, mouseY);
           t.ptToDraw = 0;
+          
         }
       
       } 
@@ -257,7 +264,7 @@ void mousePressed(){
       for(Shape obj: objs){
         
         if(obj.isPointIn(new PVector(mouseX, mouseY))){
-          
+          println("Forme séléctionnée");
           currentSelected = obj;
           println(currentSelected);
           currentColor = obj.col;
@@ -267,7 +274,6 @@ void mousePressed(){
       }
     
     }
-    
     
   }
 }

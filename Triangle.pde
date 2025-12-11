@@ -1,6 +1,8 @@
 class Triangle extends Shape{
   PVector p2;
   PVector p3;
+  
+  
   int ptToDraw = 3;
   
   void draw(){
@@ -17,4 +19,9 @@ class Triangle extends Shape{
       line(p1.x, p1.y, mouseX, mouseY);
     }
   }
+  
+  
+    
+    
+  
 }

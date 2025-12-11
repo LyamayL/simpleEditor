@@ -3,6 +3,7 @@ class Polygon extends Shape{
   // On crée une liste de PVector qui sont les points de notre polygone 
   ArrayList<PVector> points = new ArrayList<PVector>();
   boolean isEditing = true;
+  boolean isTriangle = false;
   
   void draw(){
     // Différentes couleurs en fonction de si on trace notre polygone ou s'il est terminé 
