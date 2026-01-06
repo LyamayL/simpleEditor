@@ -203,32 +203,38 @@ void mousePressed(){
       
       // si on commence un nouveau triangle
       } else if(currentShape == TRIANGLE && selectedShape==null && currentColor != pipette){
-        Triangle t  = new Triangle();
-        t.col = currentColor;
-        t.p1 = new PVector(mouseX, mouseY);
-        t.ptToDraw = 2; // on met a jour son compte a rebour de points
-        selectedShape = t;
-        /*Polygon triangle = new Polygon();
+        //Triangle t  = new Triangle();
+        //t.col = currentColor;
+        //t.p1 = new PVector(mouseX, mouseY);
+        //t.ptToDraw = 2; // on met a jour son compte a rebour de points
+        //selectedShape = t;
+        Polygon triangle = new Polygon();
         triangle.isTriangle = true;
         triangle.col = currentColor;
         triangle.p1 = new PVector(mouseX, mouseY);
         triangle.points.add(triangle.p1);
-        selectedShape = triangle;*/
+        selectedShape = triangle;
       
       // si on a deja un triangle en cours de creation 
       // Pas besoin de vérification sur le 256 car on le fait déjà lors de la création du triangle.
       } else if(currentShape == TRIANGLE && selectedShape!=null){
-        Triangle t = (Triangle)selectedShape;
-        if(t.ptToDraw==2){ // selon ou on en est du noombre de points qui restent a donner
-          t.p2 = new PVector(mouseX, mouseY);
-          t.ptToDraw = 1;
-        } else if(t.ptToDraw==1){
-          t.p3 = new PVector(mouseX, mouseY);
-          t.ptToDraw = 0;
-          
+        //Triangle t = (Polygon)selectedShape;
+        //if(t.ptToDraw==2){ // selon ou on en est du noombre de points qui restent a donner
+          //t.p2 = new PVector(mouseX, mouseY);
+          //t.ptToDraw = 1;
+        //} else if(t.ptToDraw==1){
+          //t.p3 = new PVector(mouseX, mouseY);
+          //t.ptToDraw = 0;
+        
+        Polygon t = (Polygon) selectedShape;
+        t.points.add(new PVector(mouseX, mouseY));
+        if(t.points.size() == 3){
+          t.points.add(t.points.get(0)); // Le dernier point est forcément le premier
+          t.isEditing = false;
+        }
+    
         }
       
-      } 
       
       // On commence un polygone
       else if(currentShape == POLYGON && selectedShape==null && currentColor != pipette){
@@ -257,25 +263,20 @@ void mousePressed(){
       else if(currentColor == pipette){
         color currentPixelColor = get(mouseX, mouseY);
         colors.add(currentPixelColor);
-      } 
-    
-    }else{
+      }
+      
+     }else{
     
       for(Shape obj: objs){
         
         if(obj.isPointIn(new PVector(mouseX, mouseY))){
           println("Forme séléctionnée");
           currentSelected = obj;
-          println(currentSelected);
           currentColor = obj.col;
-        
-        }
-        
+        }   
       }
-    
     }
-    
-  }
+   }
 }
 
 
@@ -294,7 +295,7 @@ void mouseReleased(){
     objs.add(selectedShape);
     selectedShape = null;
   }
-  if(currentShape == TRIANGLE && selectedShape!=null && ((Triangle)selectedShape).ptToDraw==0){
+  if(currentShape == TRIANGLE && selectedShape!=null && !((Polygon)selectedShape).isEditing){ // && ((Triangle)selectedShape).ptToDraw==0
     objs.add(selectedShape);
     selectedShape = null;
   }
