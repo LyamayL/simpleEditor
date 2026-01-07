@@ -1,5 +1,6 @@
 ArrayList<Shape> objs = new ArrayList<Shape>();
 
+color ancienne;
 color color1 = color(255, 0, 0);
 color color2 = color(0, 255, 0);
 color color3 = color(0, 0, 255);
@@ -7,6 +8,14 @@ color color4 = color(255, 255, 0);
 color color5 = color(255, 0, 255);
 color color6 = color(0, 255, 255);
 int pipette = 256; // On met a 256 car color est entre 0 et 255
+
+
+// Gérer le déplacement des points en mode édition
+boolean deplace = false;
+boolean resize = false;
+PVector ptsDeplace = null;
+Shape formeDeplace = null;
+int index = -1;
 
 PImage img;
 
@@ -88,7 +97,19 @@ void draw(){
          strokeWeight(getCurrentStrokeWeight());
     }
       
-    obj.draw();
+    obj.draw();    
+    // Si on est en mode édition, on dessine les points
+    if(edition){
+      obj.drawPoints();
+    }
+    
+  }
+  
+  // On redéssine par dessus si un objet est séléctionné
+  if(currentSelected != null){
+    strokeWeight(getCurrentStrokeWeight());
+    currentSelected.draw();
+    currentSelected.drawPoints();
   }
   
   // on dessine par dessus la forme encours ou selectionnee
@@ -146,6 +167,7 @@ void draw(){
   vertex(width-(40/2)-4-10, (8*3+32*2) + 5 + 5);
   vertex(width-(40/2) - 4, (8*3+32*2) + 5);
   endShape();
+  
 }
 
 
@@ -203,11 +225,7 @@ void mousePressed(){
       
       // si on commence un nouveau triangle
       } else if(currentShape == TRIANGLE && selectedShape==null && currentColor != pipette){
-        //Triangle t  = new Triangle();
-        //t.col = currentColor;
-        //t.p1 = new PVector(mouseX, mouseY);
-        //t.ptToDraw = 2; // on met a jour son compte a rebour de points
-        //selectedShape = t;
+
         Polygon triangle = new Polygon();
         triangle.isTriangle = true;
         triangle.col = currentColor;
@@ -218,14 +236,6 @@ void mousePressed(){
       // si on a deja un triangle en cours de creation 
       // Pas besoin de vérification sur le 256 car on le fait déjà lors de la création du triangle.
       } else if(currentShape == TRIANGLE && selectedShape!=null){
-        //Triangle t = (Polygon)selectedShape;
-        //if(t.ptToDraw==2){ // selon ou on en est du noombre de points qui restent a donner
-          //t.p2 = new PVector(mouseX, mouseY);
-          //t.ptToDraw = 1;
-        //} else if(t.ptToDraw==1){
-          //t.p3 = new PVector(mouseX, mouseY);
-          //t.ptToDraw = 0;
-        
         Polygon t = (Polygon) selectedShape;
         t.points.add(new PVector(mouseX, mouseY));
         if(t.points.size() == 3){
@@ -270,13 +280,52 @@ void mousePressed(){
       for(Shape obj: objs){
         
         if(obj.isPointIn(new PVector(mouseX, mouseY))){
-          println("Forme séléctionnée");
           currentSelected = obj;
           currentColor = obj.col;
         }   
       }
     }
+    
+    if(edition){
+  
+      for(Shape forme: objs){
+        if(forme instanceof Polygon){ 
+        for(PVector pts: forme.points){
+          
+              if(dist(mouseX, mouseY, pts.x, pts.y) <= 15 && !deplace){
+                deplace = true;
+                ptsDeplace = pts;
+                formeDeplace = forme;
+                println("déplacement");
+                break;
+              
+              }  
+            
+          }
+        }else{
+          
+          Rectangle r = (Rectangle) forme;
+          if(dist(mouseX, mouseY, r.p1.x+r.dims.x, r.p1.y+r.dims.y) <= 15 && !deplace){
+            resize = true;
+            ptsDeplace = new PVector(r.p1.x+r.dims.x, r.p1.y+r.dims.y);
+            formeDeplace = forme;
+            println("déplacement");
+            break;
+          }else if(dist(mouseX, mouseY, r.p1.x, r.p1.y) <= 15 && !deplace){
+            deplace = true;
+            ptsDeplace = new PVector(r.p1.x, r.p1.y);
+            formeDeplace = forme;
+            println("déplacement");
+            break;
+          }
+          
+        }
+      
+      }
+     }
+    
    }
+   
 }
 
 
@@ -286,6 +335,36 @@ void mouseDragged(){
     Rectangle r = (Rectangle)selectedShape;
     r.dims = new PVector(mouseX-r.p1.x,mouseY-r.p1.y);
   }
+  
+  if(edition && (deplace || resize)){
+      if(formeDeplace instanceof Polygon){
+        for(int i = 0; i<formeDeplace.points.size(); i++){
+          if(dist(ptsDeplace.x, ptsDeplace.y, formeDeplace.points.get(i).x, formeDeplace.points.get(i).y) <= 0.1){
+            formeDeplace.points.set(i, new PVector(mouseX, mouseY));
+            ptsDeplace = new PVector(mouseX, mouseY);
+            
+              if(i == 0 || i == formeDeplace.points.size() - 1){
+              
+                formeDeplace.points.set(abs(i - (formeDeplace.points.size()-1)), new PVector(mouseX, mouseY));
+              
+              }
+             
+            }
+          }
+      
+      }else{ // Si on est pas dans un polygone, on est dans un rectangle
+          Rectangle fd = (Rectangle) formeDeplace;
+          if(resize){
+            fd.dims = new PVector(mouseX-fd.p1.x,mouseY-fd.p1.y);
+          }else{
+          
+            fd.p1 = new PVector(mouseX, mouseY);
+           
+          }
+      }
+    
+    }
+  
 }
 
 void mouseReleased(){
@@ -304,69 +383,103 @@ void mouseReleased(){
     objs.add(selectedShape);
     selectedShape = null;
   }
+  
+  if(deplace || resize){
+    
+    
+     for(Shape obj: objs){
+       if(obj != formeDeplace){
+         if(obj instanceof Polygon){
+           for(int i=0; i<obj.points.size(); i++){
+             PVector currentPoint = obj.points.get(i);
+             if(dist(ptsDeplace.x, ptsDeplace.y, currentPoint.x, currentPoint.y) <= 15){
+               for(int j=0; j<formeDeplace.points.size(); j++){
+                 if(dist(ptsDeplace.x, ptsDeplace.y, formeDeplace.points.get(j).x, formeDeplace.points.get(j).y) <= 0.1){
+                    formeDeplace.points.set(j, new PVector(currentPoint.x, currentPoint.y)); 
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     resize = false;
+     deplace = false;
+     ptsDeplace = null;
+     formeDeplace = null;
+    
+  }
+  
 }
 
 void keyPressed(){
-  if(key == 32){ // Code 32 = touche espace
-      // Si espace est préssé, on enregistre le rendu dans une image.
-      int debutZone = 32+2*8;
-      int widthZone = width - (2*32+4*8);
-      PImage output = createImage(widthZone, height, ARGB); // width - ... car notre zone de dessin se situe entre 32+2*8 et width-...
-      
-      // Chargement des pixels de la fenêtre & de l'image
-      loadPixels();
-      output.loadPixels();
-      
-      int idx = 0;
-      for(int j=0; j<height; j++){
-         // On se place dans notre zone de dessin
-         for(int i=debutZone; i<debutZone+widthZone; i++){
-            // Obligé d'utiliser un autre index
-            output.pixels[idx] = pixels[i+j*width];
-            idx += 1;
-         }
-      
+  
+    if(key == 32){ // Code 32 = touche espace
+      if(!edition){
+        // Si espace est préssé, on enregistre le rendu dans une image.
+        int debutZone = 32+2*8;
+        int widthZone = width - (2*32+4*8);
+        PImage output = createImage(widthZone, height, ARGB); // width - ... car notre zone de dessin se situe entre 32+2*8 et width-...
+        
+        // Chargement des pixels de la fenêtre & de l'image
+        loadPixels();
+        output.loadPixels();
+        
+        int idx = 0;
+        for(int j=0; j<height; j++){
+           // On se place dans notre zone de dessin
+           for(int i=debutZone; i<debutZone+widthZone; i++){
+              // Obligé d'utiliser un autre index
+              output.pixels[idx] = pixels[i+j*width];
+              idx += 1;
+           }
+        
+        }
+        
+        output.updatePixels();
+        output.save("save.png");
+        println("Enregistré !");
+      }else{
+        println("Impossible d'enregistrer : mode édition activé");
       }
-      
-      output.updatePixels();
-      output.save("save.png");
-      println("Enregistré !");
-  }
-  
-  else if(key == 98){ // Si b alors on affiche les bordures
-    
-    showBorder = !showBorder;
-    print("Bordures modifiées !");
-  
-  }
-  
-  else if(key == 101){
-  
-    if(edition){
-      edition = false;
-      currentSelected = null;
-      cursor(ARROW);
-      println("Mode édition desactivé !");
-    }else{
-      edition = true;
-      currentColor = 257;
-      cursor(HAND);
-      println("Mode édition activé !");
     }
-  
-  }
-  
-  else if(key == 102){
     
-    showBg = !showBg;
-    println("Fond modifié !");
-  
-  }
-  else if(key == 109){
+    else if(key == 98){ // Si b alors on affiche les bordures
+      
+      showBorder = !showBorder;
+      print("Bordures modifiées !");
     
-    isMosaique = !isMosaique;
-    println("Style modifié !");
-  
-  }
+    }
+    
+    else if(key == 101){
+    
+      if(edition){
+        edition = false;
+        currentSelected = null;
+        currentColor = ancienne;
+        cursor(ARROW);
+        println("Mode édition desactivé !");
+      }else{
+        edition = true;
+        ancienne = currentColor;
+        currentColor = 257;
+        cursor(HAND);
+        println("Mode édition activé !");
+      }
+    
+    }
+    
+    else if(key == 102){
+      
+      showBg = !showBg;
+      println("Fond modifié !");
+    
+    }
+    else if(key == 109){
+      
+      isMosaique = !isMosaique;
+      println("Style modifié !");
+    
+    }
   
 } 

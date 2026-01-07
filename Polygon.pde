@@ -1,7 +1,6 @@
 class Polygon extends Shape{
 
   // On crée une liste de PVector qui sont les points de notre polygone 
-  ArrayList<PVector> points = new ArrayList<PVector>();
   boolean isEditing = true;
   boolean isTriangle = false;
   
@@ -39,6 +38,13 @@ class Polygon extends Shape{
         c = !c;
     return c;
   }
-
   
+  void drawPoints(){
+  
+      for(PVector pts: points){
+        ellipse(pts.x, pts.y, 15, 15);
+        fill(0);
+    }
+  
+  } 
 }
